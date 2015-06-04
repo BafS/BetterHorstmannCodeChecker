@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>POO Java8</title>
+	<meta charset="utf-8"/>
+
+	<style type="text/css">
+	body {
+		padding: 10px;
+		font-family: Arial, Helvetica, sans-serif;
+	}
+
+	button {
+		padding: 12px 200px;
+		background: #fbfbfb;
+		border: solid 1px #ddd;
+		margin: 8px 0;
+	}
+
+	#result {
+		background: #fbfbfb;
+		margin: 8px 0;
+		border: 1px solid #f0f0f0;
+		font-size: 12px;
+		padding: 12px;
+		border-radius: 5px;
+	}
+
+	#urlInput {
+		border: solid 1px #ddd;
+		padding: 7px 10px;
+		width: 500px;
+		margin: 8px 0;
+	}
+
+	.CodeMirror {
+        border: 1px solid #f0f0f0;
+        height: auto;
+    }
+
+    .CodeMirror:hover {
+        border: 1px solid #eee;
+    }
+
+    #footer {
+    	text-align: right;
+    	font-size: 8px;
+    	color: #999;
+    }
+	</style>
+	<script src="zepto.js"></script>
+
+	<link rel="stylesheet" href="codemirror-5.3/lib/codemirror.css">
+	<link rel="stylesheet" href="codemirror-5.3/theme/neo.css">
+	<script src="codemirror-5.3/lib/codemirror.js"></script>
+	<script src="codemirror-5.3/mode/css/css.js"></script>
+	<link rel="stylesheet" href="codemirror-5.3/addon/hint/show-hint.css">
+	<script src="codemirror-5.3/addon/hint/show-hint.js"></script>
+	<script src="codemirror-5.3/addon/hint/anyword-hint.js"></script>
+	<script src="codemirror-5.3/addon/edit/matchbrackets.js"></script>
+</head>
+<body>
+
+<input id="urlInput" value="" placeholder="http://cs14.cs.sjsu.edu:8080/codecheck/files?...">
+<br>
+
+<textarea id="code"></textarea>
+
+<button id="submit" onclick="submit()">SUBMIT</button>
+<br>
+
+<div id="result"></div>
+
+<div id="footer">Fabien 2015</div>
+
+<script>
+	var urlBase = 'http://cs14.cs.sjsu.edu:8080/';
+	var url = '';
+	var btn = document.getElementById('submit');
+	btn.disabled = true;
+	var exercie = {};
+	var codeArea = document.getElementById("code");
+
+	function submit() {
+
+		btn.disabled = true;
+
+		exercie.code = editor.getValue();
+		console.log(exercie);
+
+		$.post('/' + codeArea.getAttribute('name'),
+			exercie, 
+			function(res) {
+				btn.disabled = false;
+				document.getElementById('result').innerHTML = res;
+			}
+		);
+	}
+
+	function getExo(url) {
+		$.get('/' + url.replace('?', '__'), function(res) {
+			btn.disabled = false;
+			editor.setValue(res.code);
+			codeArea.setAttribute('name', res.name);
+			// console.log(res.code);
+		});
+	}
+
+	var getUrlInfo = function(href) {
+		var l = document.createElement("a");
+		l.href = href;
+		return l;
+	};
+
+	function getParameterByName(url, name) {
+	    var match = RegExp('[?&]' + name + '=([^&]*)').exec(url);
+	    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+	}
+
+	$(document).ready(function() {
+		var urlInput = $("#urlInput");
+		urlInput.on('change', function(e) {
+			url = $(this).val();
+			var urlInfo = getUrlInfo(url);
+
+			// console.log(urlInfo.search);
+			exercie.repo = getParameterByName(urlInfo.search, 'repo');
+			exercie.problem = getParameterByName(urlInfo.search, 'problem');
+
+			if(exercie.repo === null || exercie.problem === null) {
+				alert('URL not valid !');
+			} else {
+				getExo(url);
+			}
+		});
+	});
+
+      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        extraKeys: {"Ctrl-Space": "autocomplete"},
+        lineNumbers: false,
+        viewportMargin: Infinity,
+        matchBrackets: true,
+        theme: 'neo',
+        // mode: {globalVars: true}
+        // mode: {name: "text/x-java"}
+        // mode: {name: "text/x-java", globalVars: true}
+  		// styleActiveLine: true,
+		  // lineWrapping: true
+      });
+
+</script>
+</body>
+</html>
