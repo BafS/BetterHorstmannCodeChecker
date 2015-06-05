@@ -77,15 +77,13 @@ app.post('/:name', function(req, res) {
 			if(err) {
 				console.error(err);
 			}
-			// console.log(httpResponse.headers.location);
 			
 			var locationUrl = httpResponse.headers.location;
 			getNet(locationUrl, function(html) {
 				html = html.replace(/="([\w+_\.\-]+)">Download/g, '="' + locationUrl.replace('report.html', '') + '$1" class="dl">DOWNLOAD');
 				res.send(html);
 			});
-		}
-	);
+		});
 });
 
 var server = app.listen(1337, function () {
@@ -95,3 +93,7 @@ var server = app.listen(1337, function () {
   console.log('Listening at http://%s:%s', host, port);
 });
 
+// TODO - Workaround ECONNREFUSED
+process.on('uncaughtException', function(err) {
+	// console.log(err);
+});
