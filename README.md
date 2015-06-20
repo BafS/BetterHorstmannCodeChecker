@@ -1,9 +1,8 @@
 # Better Horstmann Code Checker
 
-Quick and dirty script to replace the original one with a basic textarea.
-
+Quick and dirty script to replace the original textarea with Codemirror.
 
 ## Run it
 
- - `npm install`
- - `node index.js`
+ - Install the dependencies `npm install`
+ - Run the script with `node index.js`
